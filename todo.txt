@@ -1,0 +1,10 @@
+This is a project to build a Streamlit app that uses Savitsky-Golay filering to find a smoothed
+version of data.
+
+FEATURES TO ADD
+
+1. Title
+2. Plotting Window
+3. File Reader
+4. Smoothing parameters
+5. File Export
