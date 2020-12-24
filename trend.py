@@ -55,6 +55,8 @@ window_length = 30 * pts_per_day
 col = 'conductance'
 y_filt = return_trend(dfl['cdatetime_est'], dfl[col], window_length, poly_order=2 )
 
+
+st.title('Extracting a Trend')
 fig = make_subplots(rows=2, cols=1, shared_xaxes=True)
 fig.add_trace(go.Scatter(x=dfl.index, y=dfl["conductance"], name="Unfiltered"), row=1, col=1)
 fig.add_trace(go.Scatter(x=dfl.index, y=y_filt, name="Filtered"), row=2, col=1)
