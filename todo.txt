@@ -3,11 +3,12 @@ version of data.
 
 FEATURES TO ADD
 
-1. Title
-2. Plotting Window
-3. File Reader
-4. Smoothing parameters
-5. File Export
+1. Title (done)
+2. Plotting Window (done)
+3. File Reader (postpone)
+4. Smoothing parameters (done)
+5. Column selection (done)
+5. File Export (postpone)
 
 
 Notes:
