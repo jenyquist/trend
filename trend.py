@@ -44,25 +44,13 @@ def return_trend(x, y, window_length=11, poly_order=2):
     return y_filt
 
 #%%
-data_file = '../../raw_data/Pine_2010.xlsx'
+data_file = 'Pine_2010.xlsx'
 df = pd.read_excel(data_file)
 
 # STREAMLIT SIDEBAR
-
-uploaded_file = st.sidebar.file_uploader("Load excel file", type=['xlsx'])
-if uploaded_file is not None:
-    data_file = uploaded_file
-    df = pd.read_excel(data_file)
-    window_max = int(len(df)/10)
-    window_default = int(len(df)/100)
-    df = pd.read_excel(uploaded_file)
-
-
 df['cdatetime_est'].dt.tz_localize('UTC')
 df.set_index(df["cdatetime_est"], inplace=True)
 dfl = df.dropna().copy()
-
-# Explanation
 explanation = '''
 Data are smoothed using a 
 Savitsky-Golay filter, which 
@@ -75,6 +63,11 @@ the window the more the smooth.
 The lower the polynomial order,
 the more the smoothing.
 '''
+
+col = "conductance"
+st.sidebar.title("Parameter Selection")
+cols = df.columns[1:]
+col = st.sidebar.radio("Choose column to plot", cols)
 st.sidebar.text(explanation)
 
 # Set window length
@@ -84,14 +77,12 @@ window_length = st.sidebar.slider('Npts in smoothing window', 3, window_max, win
 
 # Select polynomial order in sidebar
 poly_order = st.sidebar.radio("Select Window Polynomial Order", [1, 2, 3, 4], 1)
-
-col = 'conductance'
 y_filt = return_trend(dfl['cdatetime_est'], dfl[col], window_length=window_length, poly_order=poly_order )
 
 # STREAMLIT MAIN WINDOW
 st.title('Extracting a Trend')
 fig = make_subplots(rows=2, cols=1, shared_xaxes=True)
-fig.add_trace(go.Scatter(x=dfl.index, y=dfl["conductance"], name="Unfiltered"), row=1, col=1)
+fig.add_trace(go.Scatter(x=dfl.index, y=dfl[col], name="Unfiltered"), row=1, col=1)
 fig.add_trace(go.Scatter(x=dfl.index, y=y_filt, name="Filtered"), row=2, col=1)
 fig.update_yaxes(title=col, row=1)
 fig.update_yaxes(title=col, row=2)
