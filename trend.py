@@ -44,24 +44,61 @@ def return_trend(x, y, window_length=11, poly_order=2):
     return y_filt
 
 #%%
-pine_file = '../../raw_data/Pine_2010.xlsx'
-df = pd.read_excel(pine_file)
+data_file = '../../raw_data/Pine_2010.xlsx'
+df = pd.read_excel(data_file)
+
+# STREAMLIT SIDEBAR
+
+uploaded_file = st.sidebar.file_uploader("Load excel file", type=['xlsx'])
+if uploaded_file is not None:
+    data_file = uploaded_file
+    df = pd.read_excel(data_file)
+    window_max = int(len(df)/10)
+    window_default = int(len(df)/100)
+    df = pd.read_excel(uploaded_file)
+
+
+df['cdatetime_est'].dt.tz_localize('UTC')
 df.set_index(df["cdatetime_est"], inplace=True)
 dfl = df.dropna().copy()
 
-# Smooth data over a moving window of a month
-pts_per_day = 2 * 24
-window_length = 30 * pts_per_day
+# Explanation
+explanation = '''
+Data are smoothed using a 
+Savitsky-Golay filter, which 
+fits a polynomial to data over a
+sliding window. Using the 
+slider and radio buttons below 
+you can adjust the window length 
+and polynomial order. The longer 
+the window the more the smooth. 
+The lower the polynomial order,
+the more the smoothing.
+'''
+st.sidebar.text(explanation)
+
+# Set window length
+window_max = int(len(df)/10)
+window_default = int(len(df)/100)
+window_length = st.sidebar.slider('Npts in smoothing window', 3, window_max, window_default)
+
+# Select polynomial order in sidebar
+poly_order = st.sidebar.radio("Select Window Polynomial Order", [1, 2, 3, 4], 1)
+
 col = 'conductance'
-y_filt = return_trend(dfl['cdatetime_est'], dfl[col], window_length, poly_order=2 )
+y_filt = return_trend(dfl['cdatetime_est'], dfl[col], window_length=window_length, poly_order=poly_order )
 
-
+# STREAMLIT MAIN WINDOW
 st.title('Extracting a Trend')
 fig = make_subplots(rows=2, cols=1, shared_xaxes=True)
 fig.add_trace(go.Scatter(x=dfl.index, y=dfl["conductance"], name="Unfiltered"), row=1, col=1)
 fig.add_trace(go.Scatter(x=dfl.index, y=y_filt, name="Filtered"), row=2, col=1)
 fig.update_yaxes(title=col, row=1)
 fig.update_yaxes(title=col, row=2)
-fig.show()
+
+st.subheader('Raw and Smoothed Data')
+st.plotly_chart(fig)
+st.subheader('First 20 rows of data')
+st.write(dfl.head(20))
 
 #df_logger.to_excel('Pine_2010filtered.xlsx')

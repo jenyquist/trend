@@ -8,3 +8,8 @@ FEATURES TO ADD
 3. File Reader
 4. Smoothing parameters
 5. File Export
+
+
+Notes:
+
+* Launch with: streamlit run trend.py
